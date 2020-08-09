@@ -57,32 +57,23 @@ func (r *LoadManagerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error)
 	}
 	log.Info(fmt.Sprintf("max load %v", loadManager.Spec.LoadSetup.MaxLoad))
 	var childJobs batch.JobList
-	if err := r.List(ctx, &childJobs, client.InNamespace(req.Namespace)); err != nil {
+	if err := r.List(ctx, &childJobs, client.InNamespace(req.Namespace), client.MatchingLabels{"controller": "kubeload"}); err != nil {
 		log.Error(err, "unable to list child Jobs")
 		return ctrl.Result{}, err
 	}
+
 	desiredLoad := getDesiredLoad(&loadManager.Spec.LoadSetup, loadManager.ObjectMeta.CreationTimestamp.Time)
 
 	for _, job := range childJobs.Items {
-		fmt.Printf("1: %+v\n", *job.Spec.Parallelism)
-		fmt.Printf("2: %+v\n", desiredLoad)
 		if *job.Spec.Parallelism != desiredLoad {
 			var newJob batch.Job
 			job.DeepCopyInto(&newJob)
-			job.Spec.Parallelism = &desiredLoad
-			job.SetManagedFields(nil)
-			newJob.SetManagedFields(nil)
-			applyOpts := []client.PatchOption{client.ForceOwnership, client.FieldOwner("kubeload")}
-			err := r.Patch(ctx, &newJob, client.Apply, applyOpts...)
+			newJob.Spec.Parallelism = &desiredLoad
+			err := r.Update(ctx, &newJob, client.FieldOwner("kubeload"))
 			if err != nil {
-				log.Error(err, "unable to patch job")
-				return ctrl.Result{}, err
+				log.Error(err, "Unable to update job")
 			}
-			job.SetManagedFields(nil)
-			log.Info("patched")
-			fmt.Printf("3: %v\n", job.Name)
-			fmt.Printf("3: %v\n", *job.Spec.Parallelism)
-			//r.patchJobParallelism(job.Name,desiredLoad)
+			fmt.Printf("Job %v updated with parallelism %v", job.Name, *job.Spec.Parallelism)
 		}
 	}
 	// your logic here
@@ -103,24 +94,3 @@ func getDesiredLoad(ls *kubeloadv1.LoadSetup, createdAt time.Time) int32 {
 	loadToBeAdded := uint64(secondsPassed/intervalSeconds) * ls.HatchRate
 	return int32(math.Min(float64(ls.InitialLoad+loadToBeAdded), float64(ls.MaxLoad)))
 }
-
-type patchInt32Value struct {
-	Op    string `json:"op"`
-	Path  string `json:"path"`
-	Value int32  `json:"value"`
-}
-
-//func (r *LoadManagerReconciler) patchJobParallelism(jobName string, parallelism int32) error {
-//	payload := []patchInt32Value{{
-//		Op:    "replace",
-//		Path:  "/spec/parallelism",
-//		Value: parallelism,
-//	}}
-//	payloadBytes, _ := json.Marshal(payload)
-//	r.Patch()
-//	_, err := clientSet.
-//		BatchV1().
-//		Jobs("default").
-//		Patch(jobName, types.JSONPatchType, payloadBytes)
-//	return err
-//}
