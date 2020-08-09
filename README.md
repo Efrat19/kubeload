@@ -14,3 +14,6 @@ this operator will let you configure your loadtest's initial load, max load, int
 make install
 make run
 ```
+
+## Built With
+- [kubebuilder](https://book.kubebuilder.io/quick-start.html)
