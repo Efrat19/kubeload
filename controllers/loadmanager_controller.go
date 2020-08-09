@@ -57,7 +57,7 @@ func (r *LoadManagerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error)
 	}
 	log.Info(fmt.Sprintf("max load %v", loadManager.Spec.LoadSetup.MaxLoad))
 	var childJobs batch.JobList
-	if err := r.List(ctx, &childJobs, client.InNamespace(req.Namespace), client.MatchingLabels{"controller": "kubeload"}); err != nil {
+	if err := r.List(ctx, &childJobs, client.InNamespace(req.Namespace), client.MatchingLabels{"kubeload": loadManager.Name}); err != nil {
 		log.Error(err, "unable to list child Jobs")
 		return ctrl.Result{}, err
 	}
@@ -68,12 +68,16 @@ func (r *LoadManagerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error)
 		if *job.Spec.Parallelism != desiredLoad {
 			var newJob batch.Job
 			job.DeepCopyInto(&newJob)
-			newJob.Spec.Parallelism = &desiredLoad
-			err := r.Update(ctx, &newJob, client.FieldOwner("kubeload"))
-			if err != nil {
-				log.Error(err, "Unable to update job")
+			if isFrozen(&job) {
+				fmt.Printf("Job %v with parallelism %v is frozen, skipping\n", job.Name, *job.Spec.Parallelism)
+			} else {
+				newJob.Spec.Parallelism = &desiredLoad
+				err := r.Update(ctx, &newJob, client.FieldOwner("kubeload"))
+				if err != nil {
+					log.Error(err, "Unable to update job")
+				}
+				fmt.Printf("Job %v updated with parallelism %v\n", job.Name, *job.Spec.Parallelism)
 			}
-			fmt.Printf("Job %v updated with parallelism %v", job.Name, *job.Spec.Parallelism)
 		}
 	}
 	// your logic here
@@ -93,4 +97,9 @@ func getDesiredLoad(ls *kubeloadv1.LoadSetup, createdAt time.Time) int32 {
 	secondsPassed := time.Now().Sub(createdAt).Seconds()
 	loadToBeAdded := uint64(secondsPassed/intervalSeconds) * ls.HatchRate
 	return int32(math.Min(float64(ls.InitialLoad+loadToBeAdded), float64(ls.MaxLoad)))
+}
+
+func isFrozen(job *batch.Job) bool {
+	var freezeAnnotation = "kubeload.efrat19.io/freeze"
+	return job.Annotations[freezeAnnotation] == "true"
 }
