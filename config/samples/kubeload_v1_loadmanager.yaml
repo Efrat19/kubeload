@@ -1,0 +1,13 @@
+apiVersion: kubeload.kubeload.efrat19.io/v1
+kind: LoadManager
+metadata:
+  name: loadmanager-sample
+spec:
+  # Add fields here
+  foo: bar
+  loadSetup:
+    hatchRate: 1
+    initialLoad: 1
+    interval: 3s
+    maxLoad: 5
+  selector: {}

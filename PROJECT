@@ -1,3 +1,7 @@
 domain: kubeload.efrat19.io
 repo: github.com/Efrat19/kubeload
+resources:
+- group: kubeload
+  kind: LoadManager
+  version: v1
 version: "2"

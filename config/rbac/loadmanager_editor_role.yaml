@@ -1,0 +1,24 @@
+# permissions for end users to edit loadmanagers.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: loadmanager-editor-role
+rules:
+- apiGroups:
+  - kubeload.kubeload.efrat19.io
+  resources:
+  - loadmanagers
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - kubeload.kubeload.efrat19.io
+  resources:
+  - loadmanagers/status
+  verbs:
+  - get

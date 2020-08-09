@@ -1,0 +1,20 @@
+# permissions for end users to view loadmanagers.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: loadmanager-viewer-role
+rules:
+- apiGroups:
+  - kubeload.kubeload.efrat19.io
+  resources:
+  - loadmanagers
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - kubeload.kubeload.efrat19.io
+  resources:
+  - loadmanagers/status
+  verbs:
+  - get
