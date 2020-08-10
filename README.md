@@ -71,9 +71,9 @@ spec:
 ## Metrics
 in addition to regular go metrics, the operator also exports a custom metric-
 ### kubeload_load_volume
-- *Description:* specifies pod count on a given time.
-- *Type:* Gauge
-- *Labels:* job, namespace
+- **Type:** Gauge
+- **Description:** specifies pod count on a given time.
+- **Labels:** job, namespace
 
 ## Roadmap (I welcome your contributions :star-struck: )
 
