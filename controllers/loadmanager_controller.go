@@ -35,6 +35,9 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	"github.com/prometheus/client_golang/prometheus"
+	"sigs.k8s.io/controller-runtime/pkg/metrics"
 )
 
 // LoadManagerReconciler reconciles a LoadManager object
@@ -44,9 +47,29 @@ type LoadManagerReconciler struct {
 	Scheme *runtime.Scheme
 }
 
+var loadLabels = []string{
+	"job",
+	"namespace",
+}
+
+var (
+	loadGaugeVec = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name:      "load_volume",
+			Namespace: "kubeload",
+			Help:      "pods count",
+		},
+		loadLabels,
+	)
+)
+
+func init() {
+	// Register custom metrics with the global prometheus registry
+	metrics.Registry.MustRegister(loadGaugeVec)
+}
+
 // +kubebuilder:rbac:groups=kubeload.kubeload.efrat19.io,resources=loadmanagers,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=kubeload.kubeload.efrat19.io,resources=loadmanagers/status,verbs=get;update;patch
-
 func (r *LoadManagerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	ctx := context.Background()
 	log := r.Log.WithValues("loadmanager", req.NamespacedName)
@@ -93,10 +116,13 @@ func (r *LoadManagerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error)
 					log.Error(err, "Unable to update job")
 				}
 				if *job.Spec.Parallelism == desiredLoad {
+
 					log.Info(fmt.Sprintf("Job %v updated with parallelism %v\n", job.Name, *job.Spec.Parallelism))
 				}
 			}
 		}
+
+		loadGaugeVec.WithLabelValues(job.Name, job.Namespace).Set(float64(*job.Spec.Parallelism))
 	}
 	// your logic here
 
