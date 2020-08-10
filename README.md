@@ -70,12 +70,6 @@ To unfreeze-
 ```console
 k annotate job load-test kubeload.efrat19.io/freeze-
 ```
-## Local Build
-
-```console
-make install
-make run
-```
 ## Roadmap - (I welcome your contributions :star-struck: )
 
 - [X] build CI
@@ -85,7 +79,13 @@ make run
 - [X] Export Metrics
 - [ ] Grafana Dashboard
 - [ ] Tests
- 
+
+## Local Build
+```console
+make install
+make run
+``` 
+
 ## Built With
 - [kubebuilder](https://book.kubebuilder.io/quick-start.html)
 
