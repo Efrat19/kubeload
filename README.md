@@ -36,8 +36,7 @@ spec:
 Once the above load manager will be applied, all jobs with the label `app: load-test` will be updated with pod count 2 - (the `initialRate`). than, every 1m (the `interval`), the loadmanager will increase the pod count by 2 more pods (the `hatchRate`), until reaching 8 pods (`maxLoad`).
 
 ## Annotations
-Any time you can annotate controlled jobs with `kubeload.efrat19.io/freeze`. the load manager will not increase the pods count as long as this annotation is set to `true`
-Example - to freeze a job:
+Any time you can annotate controlled jobs with `kubeload.efrat19.io/freeze`. the load manager will not increase the pods count as long as this annotation is set to `true`, For example - to freeze a job:
 ```console
 k annotate job load-test kubeload.efrat19.io/freeze="true"
 ```
