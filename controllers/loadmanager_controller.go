@@ -19,6 +19,9 @@ package controllers
 
 import (
 	"context"
+	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/apimachinery/pkg/selection"
+
 	//"encoding/json"
 	"fmt"
 	//"k8s.io/apimachinery/pkg/types"
@@ -57,17 +60,31 @@ func (r *LoadManagerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error)
 	}
 	log.Info(fmt.Sprintf("max load %v", loadManager.Spec.LoadSetup.MaxLoad))
 	var childJobs batch.JobList
-	if err := r.List(ctx, &childJobs, client.InNamespace(req.Namespace), client.MatchingLabels{"kubeload": loadManager.Name}); err != nil {
+	selector := labels.NewSelector()
+	for labelKey, labelVal := range loadManager.Spec.Selector.MatchLabels {
+		fmt.Printf("key: %v value: %v\n", labelKey, labelVal)
+		requirement, err := labels.NewRequirement(labelKey, selection.Equals, []string{labelVal})
+		if err != nil {
+			log.Error(err, "Unable to create selector requirement")
+		}
+		selector = selector.Add(*requirement)
+	}
+	if err := r.List(ctx, &childJobs, client.InNamespace(req.Namespace), client.MatchingLabelsSelector{Selector: selector}); err != nil {
 		log.Error(err, "unable to list child Jobs")
 		return ctrl.Result{}, err
 	}
-
 	desiredLoad := getDesiredLoad(&loadManager.Spec.LoadSetup, loadManager.ObjectMeta.CreationTimestamp.Time)
 
+	fmt.Printf("Desired load: %v\n", desiredLoad)
 	for _, job := range childJobs.Items {
+		if job.Spec.Completions != nil {
+			log.Info(fmt.Sprintf("Job %v has job.Spec.Completions set, skipping. Unset it to allow kubeload to manage the job", job.Name))
+			continue
+		}
 		if *job.Spec.Parallelism != desiredLoad {
 			var newJob batch.Job
 			job.DeepCopyInto(&newJob)
+
 			if isFrozen(&job) {
 				fmt.Printf("Job %v with parallelism %v is frozen, skipping\n", job.Name, *job.Spec.Parallelism)
 			} else {
@@ -76,7 +93,9 @@ func (r *LoadManagerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error)
 				if err != nil {
 					log.Error(err, "Unable to update job")
 				}
-				fmt.Printf("Job %v updated with parallelism %v\n", job.Name, *job.Spec.Parallelism)
+				if *job.Spec.Parallelism == desiredLoad {
+					fmt.Printf("Job %v updated with parallelism %v\n", job.Name, *job.Spec.Parallelism)
+				}
 			}
 		}
 	}
