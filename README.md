@@ -51,7 +51,17 @@ spec:
         command: [ "locust","--host=https://www.zdnet.com","--no-web", "-c 1", "-r 1"]
       restartPolicy: Never
 ```
+## API
 
+
+- loadSetup:
+  - initialLoad: defines with how many pods the load should start
+  - interval: defines how much time to wait before upscaling the load volume every time 
+  - hatchRate: defines how many pods should be added on each interval
+  - maxLoad: once the paralellism will reach `maxLoad`, the manager will stop increasing the pods count.
+- selector:
+  - matchLabels:
+    key-value pairs of labels. only jobs that has this set of labels will be controlled by this manager
 ## Local Build
 
 ```console
@@ -70,3 +80,33 @@ make run
  
 ## Built With
 - [kubebuilder](https://book.kubebuilder.io/quick-start.html)
+
+
+
+
+
+
+
+
+
+
+
+-------
+
+### LoadManager
+
+PrometheusRule defines alerting rules for a Prometheus instance
+
+| Field | Description | Scheme | Required |
+| ----- | ----------- | ------ | -------- |
+| metadata |  | [metav1.ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.17/#objectmeta-v1-meta) | false |
+| spec | Specification of the load manager configuration. | [LoadManagerSpec](#LoadManagerSpec) | true |
+
+### LoadManagerSpec
+
+PrometheusRule defines alerting rules for a Prometheus instance
+
+| Field | Description | Scheme | Required |
+| ----- | ----------- | ------ | -------- |
+| loadSetup | Specification of desired load configuration. | [LoadSetup](#LoadManagerSpec) | true |
+| selector | Specification of job selection rules | [LoadManagerSelector](#LoadManagerSpec) | true |
