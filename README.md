@@ -22,16 +22,16 @@ metadata:
   name: loadmanager-sample
 spec:
   loadSetup:
-    # defines with how many pods the load should start:
+    # With how many pods the load should start:
     initialLoad: 2
-    # defines how much time to wait before upscaling the load volume:
+    # How much time to wait before upscaling the load volume:
     interval: 1m
-    # defines how many pods should be added on each interval:
+    # How many pods should be added on each interval:
     hatchRate: 1
-    # once the paralellism will reach `maxLoad`, the manager will stop increasing the pods count.
+    # The manager will stop increasing the pods count once it hits maxLoad:
     maxLoad: 8
   selector:
-    # key-value pairs of labels. only jobs that has this set of labels will be controlled by this manager
+    # Only jobs that has this set of labels will be controlled by this manager
     matchLabels:
       app: load-test
 ```
@@ -65,7 +65,7 @@ make run
 ## TODO
 
 - [X] build CI
-- [ ] Documentation
+- [X] Documentation
 - [ ] Example
 - [ ] Helm chart
 - [X] Export Metrics
@@ -83,24 +83,3 @@ make run
 
 
 
-
-
--------
-
-### LoadManager
-
-PrometheusRule defines alerting rules for a Prometheus instance
-
-| Field | Description | Scheme | Required |
-| ----- | ----------- | ------ | -------- |
-| metadata |  | [metav1.ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.17/#objectmeta-v1-meta) | false |
-| spec | Specification of the load manager configuration. | [LoadManagerSpec](#LoadManagerSpec) | true |
-
-### LoadManagerSpec
-
-PrometheusRule defines alerting rules for a Prometheus instance
-
-| Field | Description | Scheme | Required |
-| ----- | ----------- | ------ | -------- |
-| loadSetup | Specification of desired load configuration. | [LoadSetup](#LoadManagerSpec) | true |
-| selector | Specification of job selection rules | [LoadManagerSelector](#LoadManagerSpec) | true |
