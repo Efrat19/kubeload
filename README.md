@@ -75,8 +75,8 @@ in addition to regular go metrics, the operator also exports a custom metric-
 - **Description:** specifies pod count on a given time.
 - **Labels:** job, namespace
 
-## Roadmap (I welcome your contributions :star-struck: )
-
+## Roadmap 
+### (contributions are accepted :heart_eyes:)
 - [X] build CI
 - [X] Documentation
 - [X] Example
