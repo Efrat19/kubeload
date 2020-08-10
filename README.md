@@ -16,12 +16,12 @@ make run
 ```
 ## TODO
 
-- build CI
-- Documentation
-- Example
-- Helm chart
-- Export Metrics
-- Grafana Dashboard
+- [X] build CI
+- [ ] Documentation
+- [ ] Example
+- [ ] Helm chart
+- [X] Export Metrics
+- [ ] Grafana Dashboard
 
 ## Built With
 - [kubebuilder](https://book.kubebuilder.io/quick-start.html)
