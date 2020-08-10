@@ -4,7 +4,7 @@
 ## What is it
 
 This operator is a layer above kubernetes jobs that allows you to manage them in much easier and IAC-oriented way.
-I came up with the idea when load-testing my site, because I manually had to increase the load every time.
+I came up with the idea when load-testing my site using k8s job, because I manually had to increase the load every time.
 this operator will let you configure your load-test initial load, max load, interval and hatch-rate, and most important - be able to reproduce the exact same load test over and over again
 ## Installation
 Apply the CRD:
@@ -36,8 +36,7 @@ spec:
 Once the above load manager will be applied, all jobs with the label `app: load-test` will be updated with pod count 2 - (the `initialRate`). than, every 1m (the `interval`), the loadmanager will increase the pod count by 2 more pods (the `hatchRate`), until reaching 8 pods (`maxLoad`).
 
 ## Annotations
-Any time you can annotate controlled jobs with `kubeload.efrat19.io/freeze`. the load manager will not increase the pods count as long as this annotation is set to `true`
-Example - to freeze a job:
+Any time you can annotate controlled jobs with `kubeload.efrat19.io/freeze`. the load manager will not increase the pods count as long as this annotation is set to `true`, For example - to freeze a job:
 ```console
 k annotate job load-test kubeload.efrat19.io/freeze="true"
 ```
