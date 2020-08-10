@@ -22,6 +22,7 @@ make run
 - [ ] Helm chart
 - [X] Export Metrics
 - [ ] Grafana Dashboard
-
+- [ ] Tests
+ 
 ## Built With
 - [kubebuilder](https://book.kubebuilder.io/quick-start.html)
