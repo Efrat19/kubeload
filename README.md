@@ -44,8 +44,9 @@ metadata:
   namespace: kubeload
   labels:
     app: load-test
-  annotations:
-    kubeload.efrat19.io/freeze: "true"
+  # the load manager will not increase the pods count as long as this annotation is set:
+  # annotations:
+  #  kubeload.efrat19.io/freeze: "true"
 spec:
   parallelism: 1
   template:
@@ -75,11 +76,11 @@ k annotate job load-test kubeload.efrat19.io/freeze-
 make install
 make run
 ```
-## TODO
+## Roadmap - (I welcome your contributions :star-struck: )
 
 - [X] build CI
 - [X] Documentation
-- [ ] Example
+- [X] Example
 - [ ] Helm chart
 - [X] Export Metrics
 - [ ] Grafana Dashboard
