@@ -62,7 +62,6 @@ func (r *LoadManagerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error)
 	var childJobs batch.JobList
 	selector := labels.NewSelector()
 	for labelKey, labelVal := range loadManager.Spec.Selector.MatchLabels {
-		fmt.Printf("key: %v value: %v\n", labelKey, labelVal)
 		requirement, err := labels.NewRequirement(labelKey, selection.Equals, []string{labelVal})
 		if err != nil {
 			log.Error(err, "Unable to create selector requirement")
@@ -75,7 +74,7 @@ func (r *LoadManagerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error)
 	}
 	desiredLoad := getDesiredLoad(&loadManager.Spec.LoadSetup, loadManager.ObjectMeta.CreationTimestamp.Time)
 
-	fmt.Printf("Desired load: %v\n", desiredLoad)
+	log.Info(fmt.Sprintf("Desired load: %v\n", desiredLoad))
 	for _, job := range childJobs.Items {
 		if job.Spec.Completions != nil {
 			log.Info(fmt.Sprintf("Job %v has job.Spec.Completions set, skipping. Unset it to allow kubeload to manage the job", job.Name))
@@ -86,7 +85,7 @@ func (r *LoadManagerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error)
 			job.DeepCopyInto(&newJob)
 
 			if isFrozen(&job) {
-				fmt.Printf("Job %v with parallelism %v is frozen, skipping\n", job.Name, *job.Spec.Parallelism)
+				log.Info(fmt.Sprintf("Job %v with parallelism %v is frozen, skipping\n", job.Name, *job.Spec.Parallelism))
 			} else {
 				newJob.Spec.Parallelism = &desiredLoad
 				err := r.Update(ctx, &newJob, client.FieldOwner("kubeload"))
@@ -94,7 +93,7 @@ func (r *LoadManagerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error)
 					log.Error(err, "Unable to update job")
 				}
 				if *job.Spec.Parallelism == desiredLoad {
-					fmt.Printf("Job %v updated with parallelism %v\n", job.Name, *job.Spec.Parallelism)
+					log.Info(fmt.Sprintf("Job %v updated with parallelism %v\n", job.Name, *job.Spec.Parallelism))
 				}
 			}
 		}
