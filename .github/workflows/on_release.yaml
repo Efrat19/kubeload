@@ -8,6 +8,6 @@ jobs:
       - name: setup docker(Without version)
         uses: docker-practice/actions-setup-docker@master
       - run: |
-          docker manifest create efrat19/kubeload:stable efrat19/kubeload:arm-${{ github.sha }} efrat19/kubeload:amd64-${{ github.sha }}
+          docker manifest create efrat19/kubeload:stable efrat19/kubeload:amd64-${{ github.sha }}
           docker login -u ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_PASSWORD }}
           docker manifest push efrat19/kubeload:stable

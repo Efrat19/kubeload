@@ -26,14 +26,14 @@ jobs:
   push-manifest:
     runs-on: [ubuntu-latest]
     needs:
-      - build-arm
+#      - build-arm
       - build-amd64
     steps:
       - name: setup docker(Without version)
         uses: docker-practice/actions-setup-docker@master
       - run: |
-          docker manifest create efrat19/kubeload:latest efrat19/kubeload:arm-latest efrat19/kubeload:amd64-latest 
-          docker manifest create efrat19/kubeload:${{ github.sha }} efrat19/kubeload:arm-${{ github.sha }} efrat19/kubeload:amd64-${{ github.sha }}
+          docker manifest create efrat19/kubeload:latest efrat19/kubeload:amd64-latest
+          docker manifest create efrat19/kubeload:${{ github.sha }} efrat19/kubeload:amd64-${{ github.sha }}
           docker login -u ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_PASSWORD }}
           docker manifest push efrat19/kubeload:latest
           docker manifest push efrat19/kubeload:${{ github.sha }}
