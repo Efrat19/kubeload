@@ -24,10 +24,10 @@ spec:
   loadSetup:
     # With how many pods the load should start:
     initialLoad: 2
-    # How much time to wait before upscaling the load volume:
+    # How much time to wait before increasing the pod count:
     interval: 1m
     # How many pods should be added on each interval:
-    hatchRate: 1
+    hatchRate: 2
     # The manager will stop increasing the pods count once it hits maxLoad:
     maxLoad: 8
   selector:
