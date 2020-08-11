@@ -79,7 +79,7 @@ func (r *LoadManagerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error)
 		// we'll ignore not-found errors, since they can't be fixed by an immediate
 		// requeue (we'll need to wait for a new notification), and we can get them
 		// on deleted requests.
-		return ctrl.Result{Requeue:true}, client.IgnoreNotFound(err)
+		return ctrl.Result{RequeueAfter:1}, client.IgnoreNotFound(err)
 	}
 	log.Info(fmt.Sprintf("max load %v", loadManager.Spec.LoadSetup.MaxLoad))
 	var childJobs batch.JobList
@@ -93,7 +93,7 @@ func (r *LoadManagerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error)
 	}
 	if err := r.List(ctx, &childJobs, client.InNamespace(req.Namespace), client.MatchingLabelsSelector{Selector: selector}); err != nil {
 		log.Error(err, "unable to list child Jobs")
-		return ctrl.Result{Requeue:true}, err
+		return ctrl.Result{RequeueAfter:1}, err
 	}
 	desiredLoad := getDesiredLoad(&loadManager.Spec.LoadSetup, loadManager.ObjectMeta.CreationTimestamp.Time)
 
@@ -124,7 +124,7 @@ func (r *LoadManagerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error)
 
 		loadGaugeVec.WithLabelValues(job.Name, job.Namespace).Set(float64(*job.Spec.Parallelism))
 	}
-	return ctrl.Result{Requeue:true}, nil
+	return ctrl.Result{RequeueAfter:1}, nil
 }
 func (r *LoadManagerReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
