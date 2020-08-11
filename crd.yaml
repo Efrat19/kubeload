@@ -316,7 +316,7 @@ spec:
         - --enable-leader-election
         command:
         - /manager
-        image: efrat19/kubeload:21d093d96fca51ce07202f136395f30b22e1e7d1
+        image: efrat19/kubeload:3160623e7e4cfb5fc0a1152ee42bcc75cc6e205d
         name: manager
         resources:
           limits:
