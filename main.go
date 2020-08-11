@@ -71,7 +71,7 @@ func main() {
 	}
 
 	generatedClient := kubernetes.NewForConfigOrDie(mgr.GetConfig())
-	generatedInformers := kubeinformers.NewSharedInformerFactory(generatedClient, time.Minute*1)
+	generatedInformers := kubeinformers.NewSharedInformerFactory(generatedClient, time.Minute*2)
 
 	err = mgr.Add(manager.RunnableFunc(func(s <-chan struct{}) error {
 		generatedInformers.Start(s)
@@ -80,8 +80,9 @@ func main() {
 	}))
 	if err != nil {
 		setupLog.Error(err,"error Adding InformerFactory to the Manager: %v")
+	} else {
+		setupLog.Info("informer started")
 	}
-
 	if err = (&controllers.LoadManagerReconciler{
 		Client: mgr.GetClient(),
 		Log:    ctrl.Log.WithName("controllers").WithName("LoadManager"),

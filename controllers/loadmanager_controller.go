@@ -128,7 +128,6 @@ func (r *LoadManagerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error)
 
 	return ctrl.Result{}, nil
 }
-
 func (r *LoadManagerReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&kubeloadv1.LoadManager{}).Owns(&batch.Job{}).
