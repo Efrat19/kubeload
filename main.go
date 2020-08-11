@@ -20,7 +20,9 @@ import (
 	"flag"
 	"k8s.io/client-go/kubernetes"
 	"os"
+	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
+	"sigs.k8s.io/controller-runtime/pkg/source"
 	"time"
 
 	"k8s.io/apimachinery/pkg/runtime"
@@ -72,7 +74,6 @@ func main() {
 
 	generatedClient := kubernetes.NewForConfigOrDie(mgr.GetConfig())
 	generatedInformers := kubeinformers.NewSharedInformerFactory(generatedClient, time.Minute*2)
-
 	err = mgr.Add(manager.RunnableFunc(func(s <-chan struct{}) error {
 		generatedInformers.Start(s)
 		<- s
@@ -83,6 +84,14 @@ func main() {
 	} else {
 		setupLog.Info("informer started")
 	}
+	err = ctrl.Watch(
+		&source.Informer{Informer: generatedInformers.Batch().V1().Jobs()},
+		&handler.EnqueueRequestForObject{},
+	)
+	if err != nil {
+		setupLog.Error(err,"error watching jobs: %v")
+	}
+
 	if err = (&controllers.LoadManagerReconciler{
 		Client: mgr.GetClient(),
 		Log:    ctrl.Log.WithName("controllers").WithName("LoadManager"),
