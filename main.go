@@ -18,7 +18,10 @@ package main
 
 import (
 	"flag"
+	"k8s.io/client-go/kubernetes"
 	"os"
+	"sigs.k8s.io/controller-runtime/pkg/manager"
+	"time"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
@@ -28,6 +31,7 @@ import (
 
 	kubeloadv1 "github.com/Efrat19/kubeload/api/v1"
 	"github.com/Efrat19/kubeload/controllers"
+	kubeinformers "k8s.io/client-go/informers"
 	// +kubebuilder:scaffold:imports
 )
 
@@ -64,6 +68,18 @@ func main() {
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
 		os.Exit(1)
+	}
+
+	generatedClient := kubernetes.NewForConfigOrDie(mgr.GetConfig())
+	generatedInformers := kubeinformers.NewSharedInformerFactory(generatedClient, time.Minute*30)
+
+	err = mgr.Add(manager.RunnableFunc(func(s <-chan struct{}) error {
+		generatedInformers.Start(s)
+		<- s
+		return nil
+	}))
+	if err != nil {
+		setupLog.Error(err,"error Adding InformerFactory to the Manager: %v")
 	}
 
 	if err = (&controllers.LoadManagerReconciler{
