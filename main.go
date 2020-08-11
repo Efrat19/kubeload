@@ -20,9 +20,9 @@ import (
 	"flag"
 	"k8s.io/client-go/kubernetes"
 	"os"
-	"sigs.k8s.io/controller-runtime/pkg/handler"
+	//"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
-	"sigs.k8s.io/controller-runtime/pkg/source"
+	//"sigs.k8s.io/controller-runtime/pkg/source"
 	"time"
 
 	"k8s.io/apimachinery/pkg/runtime"
