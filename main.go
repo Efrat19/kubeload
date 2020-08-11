@@ -71,7 +71,7 @@ func main() {
 	}
 
 	generatedClient := kubernetes.NewForConfigOrDie(mgr.GetConfig())
-	generatedInformers := kubeinformers.NewSharedInformerFactory(generatedClient, time.Minute*30)
+	generatedInformers := kubeinformers.NewSharedInformerFactory(generatedClient, time.Minute*1)
 
 	err = mgr.Add(manager.RunnableFunc(func(s <-chan struct{}) error {
 		generatedInformers.Start(s)
