@@ -84,13 +84,13 @@ func main() {
 	} else {
 		setupLog.Info("informer started")
 	}
-	err = ctrl.Watch(
-		&source.Informer{Informer: generatedInformers.Batch().V1().Jobs()},
-		&handler.EnqueueRequestForObject{},
-	)
-	if err != nil {
-		setupLog.Error(err,"error watching jobs: %v")
-	}
+	//err = ctrl.Watch(
+	//	&source.Informer{Informer: generatedInformers.Batch().V1().Jobs()},
+	//	&handler.EnqueueRequestForObject{},
+	//)
+	//if err != nil {
+	//	setupLog.Error(err,"error watching jobs: %v")
+	//}
 
 	if err = (&controllers.LoadManagerReconciler{
 		Client: mgr.GetClient(),
