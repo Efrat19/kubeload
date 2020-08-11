@@ -124,7 +124,7 @@ func (r *LoadManagerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error)
 
 		loadGaugeVec.WithLabelValues(job.Name, job.Namespace).Set(float64(*job.Spec.Parallelism))
 	}
-	return ctrl.Result{RequeueAfter:1}, nil
+	return ctrl.Result{RequeueAfter:5}, nil
 }
 func (r *LoadManagerReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
