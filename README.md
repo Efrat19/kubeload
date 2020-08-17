@@ -1,5 +1,6 @@
 # Kubeload
 
+![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https://github.com/Efrat19/kubeload)
 
 ## What is it
 
