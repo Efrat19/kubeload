@@ -21,7 +21,7 @@ metadata:
   name: loadmanager-sample
 spec:
   loadSetup:
-    # With how many pods the load should start:
+    # With how many pods the load should start with:
     initialLoad: 2
     # How much time to wait before increasing the pod count:
     interval: 1m
